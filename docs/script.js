@@ -46,7 +46,7 @@ function generatePassword() {
     alert("Invalid length. Try again.");
   }
 
-  //length was bad, implicitly return undefined.
+  //length was bad, or no criteria selected, implicitly return undefined.
 }
 
 
