@@ -6,7 +6,7 @@ const specialCharacters = ` !"#$%&'()*+,-./:;<=>?@[\]^_\`{|}~`;
 
 // prompt user and generate password
 function generatePassword() {
-  const length = window.prompt("Provide password length:");
+  const length = window.prompt("Provide password length between 8 and 128 characters, inclusive:");
   if (length >= 8 && length <= 128) {
     const includeLowercase = confirm("Include lowercase letters?");
     const includeUppercase = confirm("Include uppercase letters?");
