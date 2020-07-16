@@ -1,67 +1,64 @@
 // Assignment code here
-const lowercase = "abcdefghijklmnopqrstuvwxyz";
-const uppercase = lowercase.toUpperCase();
-const numerals = "0123456789";
-const specialCharacters = ` !"#$%&'()*+,-./:;<=>?@[\]^_\`{|}~`;
+const characterStrings = {
+  lowercase: "abcdefghijklmnopqrstuvwxyz",
+  uppercase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+  numbers: "0123456789",
+  specialCharacters: ` !"#$%&'()*+,-./:;<=>?@[\\]^_\`{|}~`
+};
 
-// prompt user and generate password
-function generatePassword() {
-  const length = window.prompt("Provide password length between 8 and 128 characters, inclusive:");
-  if (length >= 8 && length <= 128) {
-    const includeLowercase = confirm("Include lowercase letters?");
-    const includeUppercase = confirm("Include uppercase letters?");
-    const includeNumbers = confirm("Include numerical characters?");
-    const includeSpecialCharacters = confirm("Include special characters?");
-    if (includeLowercase || includeUppercase || includeNumbers || includeSpecialCharacters) {
-      let wordbank = '';
-      if (includeLowercase) {
-        wordbank += lowercase;
-      }
-
-      if (includeUppercase) {
-        wordbank += uppercase;
-      }
-
-      if (includeNumbers) {
-        wordbank += numerals;
-      }
-
-      if (includeSpecialCharacters) {
-        wordbank += specialCharacters;
-      }
-
-      let password = "";
-      for (let i = 0; i < length; i++) {
-        const random = Math.floor(Math.random() * wordbank.length);
-        password += wordbank[random];
-      }
-
-      return password;
-    }
-    else {
-      alert("No password criteria was selected. Please try again.")
-    }
+const criteria = {
+  length: 8,
+  chars: {
+    lowercase: false,
+    uppercase: false,
+    numbers: false,
+    specialCharacters: false
   }
-  else {
-    alert("Invalid length. Try again.");
-  }
+};
 
-  //length was bad, or no criteria selected, implicitly return undefined.
+function updateRange(e) {
+  criteria.length = parseInt(e.target.value);
+  document.querySelector('#range-val').innerText = e.target.value;
 }
 
+function validateChars(criteria) {
+  return Object.keys(criteria)
+    .filter(key => criteria[key]);
+}
+
+function buildWordbank(criteria, characterStrings) {
+  return Object.keys(criteria)
+    .filter(key => criteria[key])
+    .map(key => characterStrings[key]).join('');
+}
+
+function buildPassword(wordbank, length) {
+  return new Array(length).fill(0).map(_ => {
+    return wordbank[Math.floor(Math.random() * wordbank.length)];
+  }).join('');
+}
+
+// prompt user and generate password
+function generatePassword(criteria) {
+  if (validateChars(criteria.chars)) {
+    const wordbank = buildWordbank(criteria.chars, characterStrings)
+    return buildPassword(wordbank, criteria.length);
+  }
+  else {
+    return "Invalid criteria. Please check one or more boxes below."
+  }
+}
 
 // Get references to the #generate element
 const generateBtn = document.querySelector("#generate");
 
 // Write password to the #password input
 function writePassword() {
-  const password = generatePassword();
-
+  const password = generatePassword(criteria);
   // make sure password isn't falsy. undefined mainly.
   if (password) {
     document.querySelector("#password").value = password;
   }
-
 }
 
 // Add event listener to generate button
@@ -74,3 +71,12 @@ document.addEventListener("keyup", function (event) {
     generateBtn.click();
   }
 });
+
+const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+checkboxes.forEach(box => {
+  box.addEventListener('click', (e) => {
+    criteria.chars[e.target.name] = e.target.checked;
+  });
+});
+
+document.querySelector('input[type="range"]').addEventListener('input', updateRange);
