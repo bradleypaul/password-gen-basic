@@ -6,7 +6,7 @@ const characterStrings = {
   specialCharacters: ` !"#$%&'()*+,-./:;<=>?@[\\]^_\`{|}~`
 };
 
-const criteria = {
+const start = {
   length: 8,
   chars: {
     lowercase: false,
@@ -15,6 +15,20 @@ const criteria = {
     specialCharacters: false
   }
 };
+
+let criteria = JSON.parse(JSON.stringify(start));
+
+function reset(e) {
+  document
+    .querySelectorAll('input[type="checkbox"]')
+    .forEach(box => {
+      box.checked = false;
+    });
+    document.querySelector("#password").value = '';
+    document.querySelector('input[type="range"]').value = start.length;
+    document.querySelector('#range-val').innerText = start.length;
+    criteria = JSON.parse(JSON.stringify(start));
+}
 
 function updateRange(e) {
   criteria.length = parseInt(e.target.value);
@@ -27,9 +41,7 @@ function validateChars(criteria) {
 }
 
 function buildWordbank(criteria, characterStrings) {
-  return Object.keys(criteria)
-    .filter(key => criteria[key])
-    .map(key => characterStrings[key]).join('');
+  return criteria.map(key => characterStrings[key]).join('');
 }
 
 function buildPassword(wordbank, length) {
@@ -40,8 +52,9 @@ function buildPassword(wordbank, length) {
 
 // prompt user and generate password
 function generatePassword(criteria) {
-  if (validateChars(criteria.chars)) {
-    const wordbank = buildWordbank(criteria.chars, characterStrings)
+  const filteredCriteria = validateChars(criteria.chars);
+  if (validateChars(criteria.chars).length) {
+    const wordbank = buildWordbank(filteredCriteria, characterStrings)
     return buildPassword(wordbank, criteria.length);
   }
   else {
@@ -73,11 +86,12 @@ document.addEventListener("keyup", function (event) {
 });
 
 document
-.querySelectorAll('input[type="checkbox"]')
-.forEach(box => {
-  box.addEventListener('click', (e) => {
-    criteria.chars[e.target.name] = e.target.checked;
+  .querySelectorAll('input[type="checkbox"]')
+  .forEach(box => {
+    box.addEventListener('click', (e) => {
+      criteria.chars[e.target.name] = e.target.checked;
+    });
   });
-});
 
 document.querySelector('input[type="range"]').addEventListener('input', updateRange);
+document.querySelector('#reset').addEventListener('click', reset);
