@@ -72,8 +72,9 @@ document.addEventListener("keyup", function (event) {
   }
 });
 
-const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-checkboxes.forEach(box => {
+document
+.querySelectorAll('input[type="checkbox"]')
+.forEach(box => {
   box.addEventListener('click', (e) => {
     criteria.chars[e.target.name] = e.target.checked;
   });
